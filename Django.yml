@@ -33,4 +33,10 @@
       django_manage:
         command: migrate
         app_path: /var/www/projeto02
-        virtualenv: /var/virtualenv/projeto02 
+        virtualenv: /var/virtualenv/projeto02
+
+    - name: Runserver
+      django_manage:
+        command: runserver 0.0.0.0:8000 
+        app_path: /var/www/projeto02
+        virtualenv: /var/virtualenv/projeto02
