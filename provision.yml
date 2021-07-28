@@ -51,3 +51,69 @@
       service:
         name: mysqld
         state: started
+---
+- name: setup basic
+  hosts: webserver
+  tasks:
+    - name: Installando epel
+      yum:
+        name: epel-release
+        state: present
+
+    - rpm_key:
+        state: present
+        key: https://rpms.remirepo.net/RPM-GPG-KEY-remi
+
+    - name: Install Repo for PHP74
+      yum:
+        name: http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+        state: present
+    
+    - name: Reset for repo PHP old
+      command: yum module reset php
+
+    - name: Enable PHP74
+      yum:
+        enablerepo: "php:remi-7.4"
+        name: php74
+
+    - name: Install PHP74
+      yum:
+        name: php74
+        state: present
+
+    - name: Upgrade All Packages
+      yum:
+        name: "*" 
+        state: latest
+
+    - name: install httpd
+      yum:
+        name: httpd
+        state: present
+    
+    - name: ensure httpd is running
+      service:
+        name: httpd
+        state: started
+
+    - name: open port 80 for httpd access
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+  
+    - name: Restart the firewalld service to load in the firewall changes
+      service:
+        name: firewalld
+        state: restarted
+
+    - name: Instalation Mysql8.0
+      yum:
+        name: mysql-server
+        state: present
+   
+    - name: Ensure Mysql is Running
+      service:
+        name: mysqld
+        state: started
