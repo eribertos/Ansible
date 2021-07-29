@@ -7,67 +7,26 @@
         name: epel-release
         state: present
 
-    - rpm_key:
-        state: present
-        key: https://rpms.remirepo.net/RPM-GPG-KEY-remi
+    - name: Copy Repo for PHP74
+      ansible.builtin.copy:
+        src: remi-release-8.rpm
+        dest: /tmp/remi-release-8.rpm
+    
+    - name: Install Repo Local
+      command: yum install /tmp/remi-release-8.rpm -y
+      ignore_errors: yes
 
-    - name: Install Repo for PHP74
-      yum:
-        name: http://rpms.remirepo.net/enterprise/remi-release-8.rpm
-        state: present
+    - name:  Install Utils
+      yum: 
+        name:
+          - vim 
+          - wget
+          - net-tools
 
     - name: Upgrade All Packages
       yum:
-        name: "*" 
+        name: "*"
         state: latest
-
-    - name: install httpd
-      yum:
-        name: httpd
-        state: present
-    
-    - name: ensure httpd is running
-      service:
-        name: httpd
-        state: started
-
-    - name: open port 80 for httpd access
-      firewalld:
-        service: http
-        permanent: true
-        state: enabled
-  
-    - name: Restart the firewalld service to load in the firewall changes
-      service:
-        name: firewalld
-        state: restarted
-
-    - name: Instalation Mysql8.0
-      yum:
-        name: mysql-server
-        state: present
-   
-    - name: Ensure Mysql is Running
-      service:
-        name: mysqld
-        state: started
----
-- name: setup basic
-  hosts: webserver
-  tasks:
-    - name: Installando epel
-      yum:
-        name: epel-release
-        state: present
-
-    - rpm_key:
-        state: present
-        key: https://rpms.remirepo.net/RPM-GPG-KEY-remi
-
-    - name: Install Repo for PHP74
-      yum:
-        name: http://rpms.remirepo.net/enterprise/remi-release-8.rpm
-        state: present
     
     - name: Reset for repo PHP old
       command: yum module reset php
@@ -79,13 +38,12 @@
 
     - name: Install PHP74
       yum:
-        name: php74
+        name: 
+          - php74
+          - php74-php-common
+          - php74-php-cli
+          - php74-php-fpm  
         state: present
-
-    - name: Upgrade All Packages
-      yum:
-        name: "*" 
-        state: latest
 
     - name: install httpd
       yum:
@@ -117,3 +75,12 @@
       service:
         name: mysqld
         state: started
+
+    - name: Copyng index.php
+      ansible.builtin.copy:
+        src: index.php
+        dest: /var/www/html/index.php
+        owner: apache
+        group: apache
+
+                
