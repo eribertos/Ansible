@@ -2,7 +2,7 @@
 - name: setup basic
   hosts: webserver
   tasks:
-    - name: Installando epel
+    - name: Install  epel-release
       yum:
         name: epel-release
         state: present
@@ -56,15 +56,15 @@
         src: load.php
         dest: /tmp/load.php
 
-    - name: Teste concatenar
+    - name: Load config PHP-FPM from Httpd
       ansible.builtin.shell: cat /tmp/load.php >> /etc/httpd/conf/httpd.conf
       
-    - name: ensure httpd is running
+    - name: Ensure Httpd is running
       service:
         name: httpd
         state: started
 
-    - name: open port 80 for httpd access
+    - name: Open port 80 for httpd access
       firewalld:
         service: http
         permanent: true
@@ -75,7 +75,7 @@
         name: firewalld
         state: restarted
 
-    - name: Instalation Mysql8.0
+    - name: Instalation Mysql 8.0
       yum:
         name: mysql-server
         state: present
