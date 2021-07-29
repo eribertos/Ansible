@@ -50,6 +50,15 @@
         name: httpd
         state: present
     
+
+    - name: Copyng Load.php
+      ansible.builtin.copy:
+        src: load.php
+        dest: /tmp/load.php
+
+    - name: Teste concatenar
+      ansible.builtin.shell: cat /tmp/load.php >> /etc/httpd/conf/httpd.conf
+      
     - name: ensure httpd is running
       service:
         name: httpd
