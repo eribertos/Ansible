@@ -5,5 +5,12 @@ Playbooks para instalação dos seguintes software
  - Zabbix_agentd (daemon) (Zabbix) 4.0.29
  - Git version 2.27.0
  - Mysql Server version: 8.0.21 Source distribution
+ 
+ # Serviços iniciados
+ - mysql
+ - php74-php-fpm
+ - zabbix-agent
+ - httpd
+ 
 
 
