@@ -11,15 +11,15 @@
       ansible.builtin.copy:
         src: remi-release-8.rpm
         dest: /tmp/remi-release-8.rpm
-    
+
     - name: Install Repo Local
       command: yum install /tmp/remi-release-8.rpm -y
       ignore_errors: yes
 
     - name:  Install Utils
-      yum: 
+      yum:
         name:
-          - vim 
+          - vim
           - wget
           - net-tools
 
@@ -27,7 +27,7 @@
       yum:
         name: "*"
         state: latest
-    
+
     - name: Reset for repo PHP old
       command: yum module reset php
 
@@ -38,18 +38,18 @@
 
     - name: Install PHP74
       yum:
-        name: 
+        name:
           - php74
           - php74-php-common
           - php74-php-cli
-          - php74-php-fpm  
+          - php74-php-fpm
         state: present
 
     - name: install httpd
       yum:
         name: httpd
         state: present
-    
+
 
     - name: Copyng Load.php
       ansible.builtin.copy:
@@ -58,7 +58,7 @@
 
     - name: Load config PHP-FPM from Httpd
       ansible.builtin.shell: cat /tmp/load.php >> /etc/httpd/conf/httpd.conf
-      
+
     - name: Ensure Httpd is running
       service:
         name: httpd
@@ -69,7 +69,7 @@
         service: http
         permanent: true
         state: enabled
-  
+
     - name: Restart the firewalld service to load in the firewall changes
       service:
         name: firewalld
@@ -79,7 +79,7 @@
       yum:
         name: mysql-server
         state: present
-   
+
     - name: Ensure Mysql is Running
       service:
         name: mysqld
@@ -92,4 +92,36 @@
         owner: apache
         group: apache
 
-                
+    - name: Install git
+      yum:
+        name: git
+        state: present
+
+    - name: Deploy git checkout
+      ansible.builtin.git:
+        repo: git@github.com:eribertos/Ansible.git
+        dest: /var/site/
+
+    - name: Validate Composer checksum
+      get_url:
+        dest: /usr/src/
+        url: https://getcomposer.org/installer
+      become: yes
+
+    - name: Download and install Composer
+      shell: curl -sS https://getcomposer.org/installer | php74
+      args:
+        chdir: /usr/src/
+        creates: /usr/local/bin/composer
+        warn: false
+      become: yes
+
+    - name: Add Composer to global path
+      copy: 
+        dest: /usr/local/bin/composer
+        group: root
+        mode: '0755'
+        owner: root
+        src: /usr/src/composer.phar
+        remote_src: yes
+      become: yes
